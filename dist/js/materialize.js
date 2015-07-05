@@ -1,5 +1,5 @@
 /*!
- * Materialize v0.97.0 (http://materializecss.com)
+ * Materialize vundefined (http://materializecss.com)
  * Copyright 2014-2015 Materialize
  * MIT License (https://raw.githubusercontent.com/Dogfalo/materialize/master/LICENSE)
  */
@@ -1100,11 +1100,6 @@ $(document).ready(function(){
           window_width = $(window).width();
 
       $this.width('100%');
-      // Set Tab Width for each tab
-      var $num_tabs = $(this).children('li').length;
-      $this.children('li').each(function() {
-        $(this).width((100/$num_tabs)+'%');
-      });
       var $active, $content, $links = $this.find('li.tab a'),
           $tabs_width = $this.width(),
           $tab_width = $this.find('li').first().outerWidth(),
@@ -1234,153 +1229,164 @@ $(document).ready(function(){
       var defaults = {
         delay: 350
       };
+
+      // Remove tooltip from the activator
+      if (options === "remove") {
+        this.each(function(){
+          $('#' + $(this).attr('data-tooltip-id')).remove();
+        });
+        return false;
+      }
+
       options = $.extend(defaults, options);
 
-      //Remove previously created html
-      $('.material-tooltip').remove();
 
       return this.each(function(){
+        var tooltipId = Materialize.guid();
         var origin = $(this);
+        origin.attr('data-tooltip-id', tooltipId);
 
-      // Create Text span
-      var tooltip_text = $('<span></span>').text(origin.attr('data-tooltip'));
+        // Create Text span
+        var tooltip_text = $('<span></span>').text(origin.attr('data-tooltip'));
 
-      // Create tooltip
-      var newTooltip = $('<div></div>');
-      newTooltip.addClass('material-tooltip').append(tooltip_text);
-      newTooltip.appendTo($('body'));
+        // Create tooltip
+        var newTooltip = $('<div></div>');
+        newTooltip.addClass('material-tooltip').append(tooltip_text)
+          .appendTo($('body'))
+          .attr('id', tooltipId);
 
-      var backdrop = $('<div></div>').addClass('backdrop');
-      backdrop.appendTo(newTooltip);
-      backdrop.css({ top: 0, left:0 });
+        var backdrop = $('<div></div>').addClass('backdrop');
+        backdrop.appendTo(newTooltip);
+        backdrop.css({ top: 0, left:0 });
 
 
-     //Destroy previously binded events
-    $(this).off('mouseenter mouseleave');
-      // Mouse In
-    $(this).on({
-      mouseenter: function(e) {
-        var tooltip_delay = origin.data("delay");
-        tooltip_delay = (tooltip_delay === undefined || tooltip_delay === '') ? options.delay : tooltip_delay;
-        counter = 0;
-        counterInterval = setInterval(function(){
-          counter += 10;
-          if (counter >= tooltip_delay && started === false) {
-            started = true;
-            newTooltip.css({ display: 'block', left: '0px', top: '0px' });
+       //Destroy previously binded events
+      origin.off('mouseenter.tooltip mouseleave.tooltip');
+        // Mouse In
+      origin.on({
+        'mouseenter.tooltip': function(e) {
+          var tooltip_delay = origin.data("delay");
+          tooltip_delay = (tooltip_delay === undefined || tooltip_delay === '') ? options.delay : tooltip_delay;
+          counter = 0;
+          counterInterval = setInterval(function(){
+            counter += 10;
+            if (counter >= tooltip_delay && started === false) {
+              started = true;
+              newTooltip.css({ display: 'block', left: '0px', top: '0px' });
 
-            // Set Tooltip text
-            newTooltip.children('span').text(origin.attr('data-tooltip'));
+              // Set Tooltip text
+              newTooltip.children('span').text(origin.attr('data-tooltip'));
 
-            // Tooltip positioning
-            var originWidth = origin.outerWidth();
-            var originHeight = origin.outerHeight();
-            var tooltipPosition =  origin.attr('data-position');
-            var tooltipHeight = newTooltip.outerHeight();
-            var tooltipWidth = newTooltip.outerWidth();
-            var tooltipVerticalMovement = '0px';
-            var tooltipHorizontalMovement = '0px';
-            var scale_factor = 8;
+              // Tooltip positioning
+              var originWidth = origin.outerWidth();
+              var originHeight = origin.outerHeight();
+              var tooltipPosition =  origin.attr('data-position');
+              var tooltipHeight = newTooltip.outerHeight();
+              var tooltipWidth = newTooltip.outerWidth();
+              var tooltipVerticalMovement = '0px';
+              var tooltipHorizontalMovement = '0px';
+              var scale_factor = 8;
 
-            if (tooltipPosition === "top") {
-            // Top Position
-            newTooltip.css({
-              top: origin.offset().top - tooltipHeight - margin,
-              left: origin.offset().left + originWidth/2 - tooltipWidth/2
-            });
-            tooltipVerticalMovement = '-10px';
-            backdrop.css({
-              borderRadius: '14px 14px 0 0',
-              transformOrigin: '50% 90%',
-              marginTop: tooltipHeight,
-              marginLeft: (tooltipWidth/2) - (backdrop.width()/2)
-
-            });
-            }
-            // Left Position
-            else if (tooltipPosition === "left") {
+              if (tooltipPosition === "top") {
+              // Top Position
               newTooltip.css({
-                top: origin.offset().top + originHeight/2 - tooltipHeight/2,
-                left: origin.offset().left - tooltipWidth - margin
-              });
-              tooltipHorizontalMovement = '-10px';
-              backdrop.css({
-                width: '14px',
-                height: '14px',
-                borderRadius: '14px 0 0 14px',
-                transformOrigin: '95% 50%',
-                marginTop: tooltipHeight/2,
-                marginLeft: tooltipWidth
-              });
-            }
-            // Right Position
-            else if (tooltipPosition === "right") {
-              newTooltip.css({
-                top: origin.offset().top + originHeight/2 - tooltipHeight/2,
-                left: origin.offset().left + originWidth + margin
-              });
-              tooltipHorizontalMovement = '+10px';
-              backdrop.css({
-                width: '14px',
-                height: '14px',
-                borderRadius: '0 14px 14px 0',
-                transformOrigin: '5% 50%',
-                marginTop: tooltipHeight/2,
-                marginLeft: '0px'
-              });
-            }
-            else {
-              // Bottom Position
-              newTooltip.css({
-                top: origin.offset().top + origin.outerHeight() + margin,
+                top: origin.offset().top - tooltipHeight - margin,
                 left: origin.offset().left + originWidth/2 - tooltipWidth/2
               });
-              tooltipVerticalMovement = '+10px';
+              tooltipVerticalMovement = '-10px';
               backdrop.css({
+                borderRadius: '14px 14px 0 0',
+                transformOrigin: '50% 90%',
+                marginTop: tooltipHeight,
                 marginLeft: (tooltipWidth/2) - (backdrop.width()/2)
+
               });
+              }
+              // Left Position
+              else if (tooltipPosition === "left") {
+                newTooltip.css({
+                  top: origin.offset().top + originHeight/2 - tooltipHeight/2,
+                  left: origin.offset().left - tooltipWidth - margin
+                });
+                tooltipHorizontalMovement = '-10px';
+                backdrop.css({
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '14px 0 0 14px',
+                  transformOrigin: '95% 50%',
+                  marginTop: tooltipHeight/2,
+                  marginLeft: tooltipWidth
+                });
+              }
+              // Right Position
+              else if (tooltipPosition === "right") {
+                newTooltip.css({
+                  top: origin.offset().top + originHeight/2 - tooltipHeight/2,
+                  left: origin.offset().left + originWidth + margin
+                });
+                tooltipHorizontalMovement = '+10px';
+                backdrop.css({
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '0 14px 14px 0',
+                  transformOrigin: '5% 50%',
+                  marginTop: tooltipHeight/2,
+                  marginLeft: '0px'
+                });
+              }
+              else {
+                // Bottom Position
+                newTooltip.css({
+                  top: origin.offset().top + origin.outerHeight() + margin,
+                  left: origin.offset().left + originWidth/2 - tooltipWidth/2
+                });
+                tooltipVerticalMovement = '+10px';
+                backdrop.css({
+                  marginLeft: (tooltipWidth/2) - (backdrop.width()/2)
+                });
+              }
+
+              // Calculate Scale to fill
+              scale_factor = tooltipWidth / 8;
+              if (scale_factor < 8) {
+                scale_factor = 8;
+              }
+              if (tooltipPosition === "right" || tooltipPosition === "left") {
+                scale_factor = tooltipWidth / 10;
+                if (scale_factor < 6)
+                  scale_factor = 6;
+              }
+
+              newTooltip.velocity({ marginTop: tooltipVerticalMovement, marginLeft: tooltipHorizontalMovement}, { duration: 350, queue: false })
+                .velocity({opacity: 1}, {duration: 300, delay: 50, queue: false});
+              backdrop.css({ display: 'block' })
+              .velocity({opacity:1},{duration: 55, delay: 0, queue: false})
+              .velocity({scale: scale_factor}, {duration: 300, delay: 0, queue: false, easing: 'easeInOutQuad'});
+
             }
+          }, 10); // End Interval
 
-            // Calculate Scale to fill
-            scale_factor = tooltipWidth / 8;
-            if (scale_factor < 8) {
-              scale_factor = 8;
-            }
-            if (tooltipPosition === "right" || tooltipPosition === "left") {
-              scale_factor = tooltipWidth / 10;
-              if (scale_factor < 6)
-                scale_factor = 6;
-            }
+        // Mouse Out
+        },
+        'mouseleave.tooltip': function(){
+          // Reset State
+          clearInterval(counterInterval);
+          counter = 0;
 
-            newTooltip.velocity({ opacity: 1, marginTop: tooltipVerticalMovement, marginLeft: tooltipHorizontalMovement}, { duration: 350, queue: false });
-            backdrop.css({ display: 'block' })
-            .velocity({opacity:1},{duration: 55, delay: 0, queue: false})
-            .velocity({scale: scale_factor}, {duration: 300, delay: 0, queue: false, easing: 'easeInOutQuad'});
-
-          }
-        }, 10); // End Interval
-
-      // Mouse Out
-      },
-      mouseleave: function(){
-        // Reset State
-        clearInterval(counterInterval);
-        counter = 0;
-
-        // Animate back
-        newTooltip.velocity({
-          opacity: 0, marginTop: 0, marginLeft: 0}, { duration: 225, queue: false, delay: 275 }
-        );
-        backdrop.velocity({opacity: 0, scale: 1}, {
-          duration:225,
-          delay: 275, queue: false,
-          complete: function(){
-            backdrop.css('display', 'none');
-            newTooltip.css('display', 'none');
-            started = false;}
+          // Animate back
+          newTooltip.velocity({
+            opacity: 0, marginTop: 0, marginLeft: 0}, { duration: 225, queue: false, delay: 225 }
+          );
+          backdrop.velocity({opacity: 0, scale: 1}, {
+            duration:225,
+            delay: 275, queue: false,
+            complete: function(){
+              backdrop.css('display', 'none');
+              newTooltip.css('display', 'none');
+              started = false;}
+          });
+        }
         });
-      }
-      });
     });
   };
 
@@ -1799,8 +1805,19 @@ $(document).ready(function(){
                 toast.classList.add(classes[i]);
             }
         }
-        toast.innerHTML = html;
-
+        // If type of parameter is HTML Element
+        if ( typeof HTMLElement === "object" ? html instanceof HTMLElement : html && typeof html === "object" && html !== null && html.nodeType === 1 && typeof html.nodeName==="string"
+) {
+          toast.appendChild(html);
+        }
+        else if (html instanceof jQuery) {
+          // Check if it is jQuery object
+          toast.appendChild(html[0]);
+        }
+        else {
+          // Insert as text;
+          toast.innerHTML = html; 
+        }
         // Bind hammer
         var hammerHandler = new Hammer(toast, {prevent_default: false});
         hammerHandler.on('pan', function(e) {
@@ -1872,17 +1889,18 @@ $(document).ready(function(){
         }
 
         // Add Touch Area
-        $('body').append($('<div class="drag-target"></div>'));
+        var dragTarget = $('<div class="drag-target"></div>');
+        $('body').append(dragTarget);
 
         if (options.edge == 'left') {
           menu_id.css('left', -1 * (options.menuWidth + 10));
-          $('.drag-target').css({'left': 0}); // Add Touch Area
+          dragTarget.css({'left': 0}); // Add Touch Area
         }
         else {
           menu_id.addClass('right-aligned') // Change text-alignment to right
             .css('right', -1 * (options.menuWidth + 10))
             .css('left', '');
-          $('.drag-target').css({'right': 0}); // Add Touch Area
+          dragTarget.css({'right': 0}); // Add Touch Area
         }
 
         // If fixed sidenav, bring menu out
@@ -1935,7 +1953,7 @@ $(document).ready(function(){
             } });
           if (options.edge === 'left') {
             // Reset phantom div
-            $('.drag-target').css({width: '', right: '', left: '0'});
+            dragTarget.css({width: '', right: '', left: '0'});
             menu_id.velocity(
               {left: -1 * (options.menuWidth + 10)},
               { duration: 200,
@@ -1953,7 +1971,7 @@ $(document).ready(function(){
           }
           else {
             // Reset phantom div
-            $('.drag-target').css({width: '', right: '0', left: ''});
+            dragTarget.css({width: '', right: '0', left: ''});
             menu_id.velocity(
               {right: -1 * (options.menuWidth + 10)},
               { duration: 200,
@@ -1976,11 +1994,11 @@ $(document).ready(function(){
         var panning = false;
         var menuOut = false;
 
-        $('.drag-target').on('click', function(){
+        dragTarget.on('click', function(){
           removeMenu();
         });
 
-        $('.drag-target').hammer({
+        dragTarget.hammer({
           prevent_default: false
         }).bind('pan', function(e) {
 
@@ -2059,7 +2077,7 @@ $(document).ready(function(){
               if ((menuOut && velocityX <= 0.3) || velocityX < -0.5) {
                 menu_id.velocity({left: 0}, {duration: 300, queue: false, easing: 'easeOutQuad'});
                 $('#sidenav-overlay').velocity({opacity: 1 }, {duration: 50, queue: false, easing: 'easeOutQuad'});
-                $('.drag-target').css({width: '50%', right: 0, left: ''});
+                dragTarget.css({width: '50%', right: 0, left: ''});
               }
               else if (!menuOut || velocityX > 0.3) {
                 // Enable Scrolling
@@ -2070,14 +2088,14 @@ $(document).ready(function(){
                   complete: function () {
                     $(this).remove();
                   }});
-                $('.drag-target').css({width: '10px', right: '', left: 0});
+                dragTarget.css({width: '10px', right: '', left: 0});
               }
             }
             else {
               if ((menuOut && velocityX >= -0.3) || velocityX > 0.5) {
                 menu_id.velocity({right: 0}, {duration: 300, queue: false, easing: 'easeOutQuad'});
                 $('#sidenav-overlay').velocity({opacity: 1 }, {duration: 50, queue: false, easing: 'easeOutQuad'});
-                $('.drag-target').css({width: '50%', right: '', left: 0});
+                dragTarget.css({width: '50%', right: '', left: 0});
               }
               else if (!menuOut || velocityX < -0.3) {
                 // Enable Scrolling
@@ -2088,7 +2106,7 @@ $(document).ready(function(){
                   complete: function () {
                     $(this).remove();
                   }});
-                $('.drag-target').css({width: '10px', right: 0, left: ''});
+                dragTarget.css({width: '10px', right: 0, left: ''});
               }
             }
 
@@ -2105,13 +2123,15 @@ $(document).ready(function(){
 
               // Disable Scrolling
               $('body').css('overflow', 'hidden');
-
+              // Push current drag target on top of DOM tree
+              $('body').append(dragTarget);
+              
               if (options.edge === 'left') {
-                $('.drag-target').css({width: '50%', right: 0, left: ''});
+                dragTarget.css({width: '50%', right: 0, left: ''});
                 menu_id.velocity({left: 0}, {duration: 300, queue: false, easing: 'easeOutQuad'});
               }
               else {
-                $('.drag-target').css({width: '50%', right: '', left: 0});
+                dragTarget.css({width: '50%', right: '', left: 0});
                 menu_id.velocity({right: 0}, {duration: 300, queue: false, easing: 'easeOutQuad'});
                 menu_id.css('left','');
               }
@@ -2590,7 +2610,7 @@ $(document).ready(function(){
       }
     });
 
-    $('body').on('keyup keydown', text_area_selector, function () {
+    $('body').on('keyup keydown autoresize', text_area_selector, function () {
       textareaAutoResize($(this));
     });
 
@@ -2599,7 +2619,12 @@ $(document).ready(function(){
     $('.file-field').each(function() {
       var path_input = $(this).find('input.file-path');
       $(this).find('input[type="file"]').change(function () {
-        path_input.val($(this)[0].files[0].name);
+        var files = $(this)[0].files;
+        var file_names = [];
+        for (var i=0; i < files.length; i++) {
+          file_names.push(files[i].name);
+        }
+        path_input.val(file_names.join(", "));
         path_input.trigger('change');
       });
     });
@@ -2691,9 +2716,8 @@ $(document).ready(function(){
           left = width;
         }
         thumb.addClass('active').css('left', left);
-
+        thumb.find('.value').html(thumb.siblings(range_type).val());
       }
-
     });
 
     $(document).on('mouseout touchleave', range_wrapper, function() {
@@ -2715,6 +2739,7 @@ $(document).ready(function(){
 
   // Select Plugin
   $.fn.material_select = function (callback) {
+    var $select;
     $(this).each(function(){
       $select = $(this);
 
@@ -2725,7 +2750,7 @@ $(document).ready(function(){
       // Tear down structure if Select needs to be rebuilt
       var lastID = $select.data('select-id');
       if (lastID) {
-        $select.parent().find('i').remove();
+        $select.parent().find('span.caret').remove();
         $select.parent().find('input').remove();
 
         $select.unwrap();
@@ -2757,20 +2782,22 @@ $(document).ready(function(){
       // Create Dropdown structure
       selectOptions.each(function () {
         // Add disabled attr if disabled
-        options.append($('<li class="' + (($(this).is(':disabled')) ? 'disabled' : '') + '"><span>' + $(this).html() + '</span></li>'));
+        var $this = $(this);
+        options.append($('<li class="' + (($this.is(':disabled')) ? 'disabled' : '') + '" data-value="' + $this.attr('value') + '"><span>' + $this.html() + '</span></li>'));
       });
 
 
       options.find('li').each(function (i) {
         var $curr_select = $select;
-        $(this).click(function () {
+        var $this = $(this);
+        $this.click(function () {
           // Check if option element is disabled
-          if (!$(this).hasClass('disabled')) {
+          if (!$this.hasClass('disabled')) {
             $curr_select.find('option').eq(i).prop('selected', true);
             // Trigger onchange() event
             $curr_select.trigger('change');
-            $curr_select.siblings('input.select-dropdown').val($(this).text());
-            if (typeof callback !== 'undefined') callback();
+            $curr_select.siblings('input.select-dropdown').val($this.text());
+            if (typeof callback !== 'undefined') callback($this.attr('data-value'));
           }
         });
 
@@ -2803,7 +2830,7 @@ $(document).ready(function(){
       $newSelect.on('focus', function(){
         $(this).trigger('open');
         label = $(this).val();
-        selectedOption = options.find('li').filter(function() {
+        var selectedOption = options.find('li').filter(function() {
           return $(this).text().toLowerCase() === label.toLowerCase();
         })[0];
         activateOption(options, selectedOption);
@@ -2822,7 +2849,7 @@ $(document).ready(function(){
 
       // Allow user to search by typing
       // this array is cleared after 1 second
-      filterQuery = [];
+      var filterQuery = [];
 
       onKeyDown = function(event){
         // TAB - switch to another input
@@ -2845,14 +2872,14 @@ $(document).ready(function(){
         event.preventDefault();
 
         // CASE WHEN USER TYPE LETTERS
-        letter = String.fromCharCode(event.which).toLowerCase();
+        var letter = String.fromCharCode(event.which).toLowerCase();
         var nonLetters = [9,13,27,38,40];
         if (letter && (nonLetters.indexOf(event.which) === -1)){
           filterQuery.push(letter);
 
-          string = filterQuery.join("");
+          var string = filterQuery.join("");
 
-          newOption = options.find('li').filter(function() {
+          var newOption = options.find('li').filter(function() {
             return $(this).text().toLowerCase().indexOf(string) === 0;
           })[0];
 
@@ -2863,7 +2890,7 @@ $(document).ready(function(){
 
         // ENTER - select option and close when select options are opened
         if(event.which == 13){
-          activeOption = options.find('li.active:not(.disabled)')[0];
+          var activeOption = options.find('li.active:not(.disabled)')[0];
           if(activeOption){
             $(activeOption).trigger('click');
             $newSelect.trigger('close');

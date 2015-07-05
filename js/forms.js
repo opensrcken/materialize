@@ -271,6 +271,7 @@
 
   // Select Plugin
   $.fn.material_select = function (callback) {
+    var $select;
     $(this).each(function(){
       $select = $(this);
 
@@ -313,20 +314,24 @@
       // Create Dropdown structure
       selectOptions.each(function () {
         // Add disabled attr if disabled
-        options.append($('<li class="' + (($(this).is(':disabled')) ? 'disabled' : '') + '"><span>' + $(this).html() + '</span></li>'));
+        var $this = $(this);
+        options.append($('<li class="' + (($this.is(':disabled')) ? 'disabled' : '') + '" data-value="' + $this.attr('value') + '"><span>' + $this.html() + '</span></li>'));
       });
 
 
       options.find('li').each(function (i) {
         var $curr_select = $select;
-        $(this).click(function () {
+        var $this = $(this);
+        $this.click(function () {
           // Check if option element is disabled
-          if (!$(this).hasClass('disabled')) {
+          if (!$this.hasClass('disabled')) {
+            var value = $this.attr('data-value');
+
             $curr_select.find('option').eq(i).prop('selected', true);
             // Trigger onchange() event
             $curr_select.trigger('change');
-            $curr_select.siblings('input.select-dropdown').val($(this).text());
-            if (typeof callback !== 'undefined') callback();
+            $curr_select.siblings('input.select-dropdown').val($this.text());
+            if (typeof callback !== 'undefined') callback(value);
           }
         });
 
@@ -359,7 +364,7 @@
       $newSelect.on('focus', function(){
         $(this).trigger('open');
         label = $(this).val();
-        selectedOption = options.find('li').filter(function() {
+        var selectedOption = options.find('li').filter(function() {
           return $(this).text().toLowerCase() === label.toLowerCase();
         })[0];
         activateOption(options, selectedOption);
@@ -378,7 +383,7 @@
 
       // Allow user to search by typing
       // this array is cleared after 1 second
-      filterQuery = [];
+      var filterQuery = [];
 
       onKeyDown = function(event){
         // TAB - switch to another input
@@ -401,14 +406,14 @@
         event.preventDefault();
 
         // CASE WHEN USER TYPE LETTERS
-        letter = String.fromCharCode(event.which).toLowerCase();
+        var letter = String.fromCharCode(event.which).toLowerCase();
         var nonLetters = [9,13,27,38,40];
         if (letter && (nonLetters.indexOf(event.which) === -1)){
           filterQuery.push(letter);
 
-          string = filterQuery.join("");
+          var string = filterQuery.join("");
 
-          newOption = options.find('li').filter(function() {
+          var newOption = options.find('li').filter(function() {
             return $(this).text().toLowerCase().indexOf(string) === 0;
           })[0];
 
@@ -419,7 +424,7 @@
 
         // ENTER - select option and close when select options are opened
         if(event.which == 13){
-          activeOption = options.find('li.active:not(.disabled)')[0];
+          var activeOption = options.find('li.active:not(.disabled)')[0];
           if(activeOption){
             $(activeOption).trigger('click');
             $newSelect.trigger('close');
