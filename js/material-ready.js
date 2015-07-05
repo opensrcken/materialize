@@ -1,0 +1,1 @@
+$('body').trigger('materialize-js-ready');

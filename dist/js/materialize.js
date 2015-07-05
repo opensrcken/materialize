@@ -1,8 +1,3 @@
-/*!
- * Materialize vundefined (http://materializecss.com)
- * Copyright 2014-2015 Materialize
- * MIT License (https://raw.githubusercontent.com/Dogfalo/materialize/master/LICENSE)
- */
 /*
  * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
  *
@@ -2793,11 +2788,13 @@ $(document).ready(function(){
         $this.click(function () {
           // Check if option element is disabled
           if (!$this.hasClass('disabled')) {
+            var value = $this.attr('data-value');
+
             $curr_select.find('option').eq(i).prop('selected', true);
             // Trigger onchange() event
             $curr_select.trigger('change');
             $curr_select.siblings('input.select-dropdown').val($this.text());
-            if (typeof callback !== 'undefined') callback($this.attr('data-value'));
+            if (typeof callback !== 'undefined') callback(value);
           }
         });
 
@@ -6184,3 +6181,4 @@ Picker.extend( 'pickadate', DatePicker )
   });
 
 }( jQuery ));
+;$('body').trigger('materialize-js-ready');

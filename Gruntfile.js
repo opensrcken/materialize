@@ -105,6 +105,7 @@ module.exports = function(grunt) {
               "js/date_picker/picker.js",
               "js/date_picker/picker.date.js",
               "js/character_counter.js",
+              "js/material-ready.js",
              ],
         // the location of the resulting JS file
         dest: 'dist/js/materialize.js'
@@ -139,6 +140,7 @@ module.exports = function(grunt) {
               "js/date_picker/picker.js",
               "js/date_picker/picker.date.js",
               "js/character_counter.js",
+              "js/material-ready.js",
              ],
         // the location of the resulting JS file
         dest: 'temp/js/materialize.js'
@@ -568,6 +570,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('jade_compile', ['jade', 'notify:jade_compile']);
   grunt.registerTask('js_compile', ['concat:temp', 'uglify:bin', 'notify:js_compile', 'clean:temp']);
+  grunt.registerTask('js_dist', ['concat:dist', 'notify:js_compile']);
   grunt.registerTask('sass_compile', ['sass:gh', 'sass:bin', 'notify:sass_compile']);
   grunt.registerTask('server', ['browserSync', 'notify:server']);
   grunt.registerTask('lint', ['removelogging:source']);
