@@ -13,8 +13,6 @@
     "bin": "bin",
     "font": "font"
   },
-  "dependencies": {
-  },
   "engine": "node >= 0.10",
   "devDependencies": {
     "grunt": "^0.4.5",
